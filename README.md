@@ -3,6 +3,8 @@
 M.Tech (AIML/DSE) — Machine Learning, Assignment 2
 BITS Pilani WILP
 
+Ashish Sanjay Takawale (2025AC05119)
+
 ## a. Problem Statement
 
 Obesity is a growing public-health concern, and its early estimation from a
@@ -44,7 +46,7 @@ performance.
 
 ## c. GitHub Repository Link
 
-🔗 **https://github.com/ashish-bits-edu/ML-Assignment-2**
+**https://github.com/ashish-bits-edu/ML-Assignment-2**
 
 ## d. Models Used
 
@@ -81,7 +83,7 @@ in [`model/metrics.csv`](model/metrics.csv).)*
 ## Repository Structure
 
 ```
-project-folder/
+ML-Assignment-2/
 │-- app.py                    # Streamlit app
 │-- requirements.txt
 │-- README.md
@@ -119,14 +121,8 @@ streamlit run app.py
 
 ## Live App
 
-🔗 **https://ml-assignment-2-obesityclassification.streamlit.app**
+**https://ml-assignment-2-obesityclassification.streamlit.app**
 
 ## Tech Stack
 
-`Python`, `scikit-learn`, `pandas`, `numpy`, `Streamlit`, `matplotlib`,
-`seaborn`
-
-## Academic Integrity
-
-This dataset, model choices, and Streamlit app structure were built
-specifically for this assignment; no template repository was copied.
+Python, scikit-learn, pandas, numpy, Streamlit, matplotlib, seaborn.

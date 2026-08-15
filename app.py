@@ -1,11 +1,12 @@
 """
-Streamlit app - ML Assignment 2 (Obesity Level Classification)
+Streamlit app for ML Assignment 2 - Obesity Level Classification.
 
-Features:
-  a. CSV upload (test data)
-  b. Model selection dropdown
-  c. Evaluation metrics display
-  d. Confusion matrix + classification report
+Lets a user upload a test CSV, pick one of the 5 trained models (or compare
+all of them at once), and view the resulting metrics, confusion matrix and
+classification report. The models themselves are trained separately by
+model/train_models.py and just loaded here.
+
+Run with: streamlit run app.py
 """
 
 import json
@@ -30,7 +31,6 @@ from sklearn.metrics import (
 
 st.set_page_config(
     page_title="Obesity Level Classifier",
-    page_icon="⚖️",
     layout="wide",
 )
 
@@ -48,6 +48,13 @@ MODEL_FILES = {
 
 @st.cache_resource
 def load_artifacts():
+    """Load the saved pipelines once per session instead of on every rerun.
+
+    Streamlit reruns this whole script on every widget interaction, and
+    the Random Forest pickle alone is a few MB, so caching this keeps the
+    app responsive instead of re-reading every .pkl from disk each time a
+    dropdown changes.
+    """
     models = {
         name: joblib.load(os.path.join(MODEL_DIR, fname))
         for name, fname in MODEL_FILES.items()
@@ -63,14 +70,14 @@ models, label_encoder, feature_info, metrics_train = load_artifacts()
 FEATURE_COLS = feature_info["all_features"]
 TARGET_COL = feature_info["target"]
 
-st.title("⚖️ Obesity Level Classification")
+st.title("Obesity Level Classification")
 st.caption(
     "M.Tech ML Assignment 2 — Multi-class classification on the UCI "
     "*Estimation of Obesity Levels* dataset, comparing 5 ML models."
 )
 
 # ---------------------------------------------------------------------------
-# Sidebar
+# Sidebar controls
 # ---------------------------------------------------------------------------
 st.sidebar.header("Controls")
 
@@ -91,15 +98,19 @@ st.sidebar.markdown(
 )
 
 # ---------------------------------------------------------------------------
-# Helpers
+# Helper functions
 # ---------------------------------------------------------------------------
 
 def compute_metrics(y_true_enc, y_pred_enc, y_proba, n_classes):
+    """Same 6 metrics as the training script, computed here on whatever
+    data the user just uploaded rather than the fixed train/test split."""
     labels = list(range(n_classes))
     auc_kwargs = dict(multi_class="ovr", average="macro", labels=labels)
     try:
         auc = roc_auc_score(y_true_enc, y_proba, **auc_kwargs)
     except ValueError:
+        # Happens if the uploaded CSV only contains a subset of the 7
+        # classes - AUC needs at least two classes present to be defined.
         auc = np.nan
     return {
         "Accuracy": accuracy_score(y_true_enc, y_pred_enc),
@@ -116,6 +127,9 @@ def compute_metrics(y_true_enc, y_pred_enc, y_proba, n_classes):
 
 
 def run_model(name, df, has_target):
+    """Predict with the chosen pipeline, and evaluate against the target
+    column if the uploaded CSV happens to include it (test_data.csv does,
+    a plain feature-only CSV wouldn't)."""
     pipeline = models[name]
     X = df[FEATURE_COLS]
     y_pred_enc = pipeline.predict(X)
@@ -149,6 +163,8 @@ def plot_confusion_matrix(y_true_enc, y_pred_enc, class_names):
     )
     ax.set_xlabel("Predicted")
     ax.set_ylabel("Actual")
+    # Class names are long (e.g. "Overweight_Level_II"), so rotate the
+    # x-axis labels or they overlap and become unreadable.
     plt.xticks(rotation=45, ha="right")
     plt.yticks(rotation=0)
     plt.tight_layout()
@@ -156,11 +172,11 @@ def plot_confusion_matrix(y_true_enc, y_pred_enc, class_names):
 
 
 # ---------------------------------------------------------------------------
-# Main
+# Main page
 # ---------------------------------------------------------------------------
 if uploaded_file is None:
     st.info(
-        "⬅️ Upload a CSV (e.g. `test_data.csv` from the repo) using the sidebar "
+        "Upload a CSV (e.g. `test_data.csv` from the repo) using the sidebar "
         "to get started. The file should contain the 16 feature columns; "
         "including the `NObeyesdad` target column enables full metric "
         "evaluation, confusion matrix and classification report."
@@ -182,14 +198,16 @@ if missing_cols:
 
 has_target = TARGET_COL in df.columns
 
-st.subheader("📄 Uploaded data preview")
+st.subheader("Uploaded data preview")
 st.dataframe(df.head(10), use_container_width=True)
 st.caption(f"{df.shape[0]} rows × {df.shape[1]} columns")
 
 st.markdown("---")
 
 if model_choice != "Compare all models":
-    st.subheader(f"🔎 Results — {model_choice}")
+    # Single-model view: metrics, confusion matrix, classification report,
+    # and the raw predictions.
+    st.subheader(f"Results — {model_choice}")
     result = run_model(model_choice, df, has_target)
 
     if has_target:
@@ -225,7 +243,9 @@ if model_choice != "Compare all models":
     st.dataframe(pred_df, use_container_width=True)
 
 else:
-    st.subheader("📊 Comparison across all 5 models")
+    # "Compare all models" view: run every pipeline on the same uploaded
+    # data and lay the results out side by side.
+    st.subheader("Comparison across all 5 models")
     if not has_target:
         st.warning(
             f"No `{TARGET_COL}` column found in the uploaded CSV — metric "
@@ -255,7 +275,7 @@ else:
     st.pyplot(fig)
 
     best_model = comp_df["F1"].idxmax()
-    st.success(f"🏆 Best model on this data by F1 score: **{best_model}**")
+    st.success(f"Best model on this data by F1 score: {best_model}")
 
     st.markdown("#### Confusion matrix per model")
     tabs = st.tabs(list(models.keys()))
@@ -268,5 +288,5 @@ else:
             st.pyplot(fig)
 
 st.markdown("---")
-with st.expander("📌 Reference: metrics computed during training (full test split)"):
+with st.expander("Reference: metrics computed during training (full test split)"):
     st.dataframe(metrics_train, use_container_width=True)
