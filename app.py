@@ -1,4 +1,5 @@
 """
+2025ac05119 - Ashish Takawale
 Streamlit app for ML Assignment 2 - Obesity Level Classification.
 
 Lets a user upload a test CSV, pick one of the 5 trained models (or compare
@@ -72,7 +73,7 @@ TARGET_COL = feature_info["target"]
 
 st.title("Obesity Level Classification")
 st.caption(
-    "M.Tech ML Assignment 2 — Multi-class classification on the UCI "
+    "M.Tech ML Assignment 2 - Multi-class classification on the UCI "
     "*Estimation of Obesity Levels* dataset, comparing 5 ML models."
 )
 
@@ -224,7 +225,7 @@ st.markdown("---")
 if model_choice != "Compare all models":
     # Single-model view: metrics, confusion matrix, classification report,
     # and the raw predictions.
-    st.subheader(f"Results — {model_choice}")
+    st.subheader(f"Results - {model_choice}")
     result = run_model(model_choice, df, has_target)
 
     if has_target:
@@ -250,7 +251,7 @@ if model_choice != "Compare all models":
         st.dataframe(pd.DataFrame(report).T.round(4), use_container_width=True)
     else:
         st.warning(
-            f"No `{TARGET_COL}` column found — showing predictions only "
+            f"No `{TARGET_COL}` column found - showing predictions only "
             "(metrics need ground-truth labels)."
         )
 
@@ -265,7 +266,7 @@ else:
     st.subheader("Comparison across all 5 models")
     if not has_target:
         st.warning(
-            f"No `{TARGET_COL}` column found in the uploaded CSV — metric "
+            f"No `{TARGET_COL}` column found in the uploaded CSV - metric "
             "comparison requires ground-truth labels."
         )
         st.stop()

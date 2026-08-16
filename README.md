@@ -1,10 +1,10 @@
-# Obesity Level Classification — ML Assignment 2
+# Obesity Level Classification - ML Assignment 2
 
-M.Tech (AIML/DSE) — Machine Learning, Assignment 2
+M.Tech - Machine Learning, Assignment 2
 BITS Pilani WILP
 
-Ashish Sanjay Takawale (2025AC05119)
-
+Name - Ashish Sanjay Takawale 
+BITS ID - 2025AC05119
 ## a. Problem Statement
 
 Obesity is a growing public-health concern, and its early estimation from a
@@ -22,7 +22,7 @@ performance.
 - **Name**: Estimation of Obesity Levels Based on Eating Habits and Physical
   Condition
 - **Source**: [UCI Machine Learning Repository, ID 544](https://archive.ics.uci.edu/dataset/544/estimation+of+obesity+levels+based+on+eating+habits+and+physical+condition)
-- **Instances**: 2,111 records (2,087 after removing exact duplicates) —
+- **Instances**: 2,111 records (2,087 after removing exact duplicates) -
   individuals from Mexico, Peru and Colombia. 77% of records were
   synthetically generated with the SMOTE filter to balance classes; 23% were
   collected directly via a web survey.
@@ -35,10 +35,10 @@ performance.
     (frequent high-caloric food consumption), `CAEC` (eating between meals),
     `SMOKE`, `SCC` (calorie monitoring), `CALC` (alcohol consumption),
     `MTRANS` (transportation used)
-- **Target**: `NObeyesdad` — 7-class obesity level (`Insufficient_Weight`,
+- **Target**: `NObeyesdad` - 7-class obesity level (`Insufficient_Weight`,
   `Normal_Weight`, `Overweight_Level_I`, `Overweight_Level_II`,
   `Obesity_Type_I`, `Obesity_Type_II`, `Obesity_Type_III`), fairly balanced
-  (272–351 instances per class).
+  (272-351 instances per class).
 - **Split**: Stratified 80/20 train/test split (`random_state=42`). The 20%
   held-out test split (418 rows) is saved as [`test_data.csv`](test_data.csv)
   and is the file used both for training-time evaluation and for the
@@ -73,12 +73,12 @@ in [`model/metrics.csv`](model/metrics.csv).)*
 
 | ML Model Name | Observation about model performance |
 |---|---|
-| Logistic Regression | Strong linear baseline (AUC 0.986) — the classes are well separated probabilistically, but a purely linear decision boundary loses some accuracy (89.7%) at the fine-grained boundaries between adjacent classes (e.g. Overweight I vs II), since the true class boundaries are threshold/BMI-based rather than linear. |
+| Logistic Regression | Strong linear baseline (AUC 0.986) - the classes are well separated probabilistically, but a purely linear decision boundary loses some accuracy (89.7%) at the fine-grained boundaries between adjacent classes (e.g. Overweight I vs II), since the true class boundaries are threshold/BMI-based rather than linear. |
 | Decision Tree | Performs close to Random Forest (93.1% accuracy) because it can directly learn the sharp, threshold-like splits on `Height`/`Weight` that effectively define the BMI-based classes. Being a single tree, it is more prone to overfitting/variance than the forest, reflected in a slightly lower AUC. |
 | kNN | Weaker performer (80.6% accuracy). Distance in the scaled + one-hot encoded feature space is diluted by the categorical dummy features, and with 7 fine-grained, adjacent classes, majority voting among neighbors misclassifies many borderline points. Sensitive to the choice of `k` (used `k=9`). |
-| Naive Bayes | Clearly the weakest model (51.4% accuracy). GaussianNB assumes features are conditionally independent given the class and Gaussian-distributed — both assumptions are badly violated here: `Height` and `Weight` are highly correlated (both directly determine the BMI-based label) and several one-hot categorical features are far from Gaussian. |
-| Random Forest (Ensemble) | **Best model overall** — highest Accuracy (93.5%), AUC (0.993), Precision, F1 and MCC (0.925). Averaging many decorrelated trees smooths out the overfitting/variance of a single Decision Tree while still capturing the same non-linear, threshold-based structure in the data. |
-| **Overall Winner for your dataset?** | **Random Forest (Ensemble)** — best or joint-best on every metric, and most robust to the noisy/overlapping boundary cases between adjacent obesity classes. |
+| Naive Bayes | Clearly the weakest model (51.4% accuracy). GaussianNB assumes features are conditionally independent given the class and Gaussian-distributed - both assumptions are badly violated here: `Height` and `Weight` are highly correlated (both directly determine the BMI-based label) and several one-hot categorical features are far from Gaussian. |
+| Random Forest (Ensemble) | **Best model overall** - highest Accuracy (93.5%), AUC (0.993), Precision, F1 and MCC (0.925). Averaging many decorrelated trees smooths out the overfitting/variance of a single Decision Tree while still capturing the same non-linear, threshold-based structure in the data. |
+| **Overall Winner for your dataset?** | **Random Forest (Ensemble)** - best or joint-best on every metric, and most robust to the noisy/overlapping boundary cases between adjacent obesity classes. |
 
 ## Repository Structure
 
@@ -109,14 +109,14 @@ streamlit run app.py
 
 ## Streamlit App Features
 
-1. **CSV upload** — upload `test_data.csv` (or any CSV with the same 16
+1. **CSV upload** - upload `test_data.csv` (or any CSV with the same 16
    feature columns, optionally including the `NObeyesdad` target column for
    full evaluation).
-2. **Model selection dropdown** — pick any of the 5 models individually, or
+2. **Model selection dropdown** - pick any of the 5 models individually, or
    "Compare all models" to see all 5 side by side.
-3. **Evaluation metrics display** — Accuracy, AUC, Precision, Recall, F1, MCC
+3. **Evaluation metrics display** - Accuracy, AUC, Precision, Recall, F1, MCC
    computed live on the uploaded data.
-4. **Confusion matrix & classification report** — per-class breakdown for the
+4. **Confusion matrix & classification report** - per-class breakdown for the
    selected model(s).
 
 ## Live App
