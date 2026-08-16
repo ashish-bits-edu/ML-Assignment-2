@@ -202,6 +202,23 @@ st.subheader("Uploaded data preview")
 st.dataframe(df.head(10), use_container_width=True)
 st.caption(f"{df.shape[0]} rows × {df.shape[1]} columns")
 
+if has_target:
+    # Quick sanity-check plot before diving into model results: how are
+    # the 7 classes actually distributed in whatever got uploaded. Useful
+    # since test_data.csv is a random 20% split and worth confirming it
+    # isn't skewed towards one class before trusting the metrics below.
+    st.markdown("#### Class distribution in uploaded data")
+    class_counts = df[TARGET_COL].value_counts().reindex(
+        label_encoder.classes_, fill_value=0
+    )
+    fig, ax = plt.subplots(figsize=(9, 3.5))
+    class_counts.plot(kind="bar", ax=ax, color="#4C72B0")
+    ax.set_ylabel("Count")
+    ax.set_xlabel("")
+    plt.xticks(rotation=30, ha="right")
+    plt.tight_layout()
+    st.pyplot(fig)
+
 st.markdown("---")
 
 if model_choice != "Compare all models":
